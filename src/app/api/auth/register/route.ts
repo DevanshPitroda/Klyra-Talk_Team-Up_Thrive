@@ -76,10 +76,17 @@ export async function POST(request: Request) {
       { success: true, message: 'Account created successfully!' },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration API error:', error);
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0] || 'account details';
+      return NextResponse.json(
+        { error: `An account with this ${field} already exists. Please sign in or use another.` },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
-      { error: 'Something went wrong. Please try again.' },
+      { error: error.message || 'Something went wrong. Please try again.' },
       { status: 500 }
     );
   }

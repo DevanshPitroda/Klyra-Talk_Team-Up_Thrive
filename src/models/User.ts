@@ -20,7 +20,7 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
   {
     name:     { type: String, required: true },
-    username: { type: String, required: true, unique: true, index: true },
+    username: { type: String, required: true, unique: true, sparse: true, index: true },
     email:    { type: String, required: true, unique: true, index: true },
     password: { type: String, default: null, select: false }, // Never returned in queries by default
     image:    { type: String, default: null },
