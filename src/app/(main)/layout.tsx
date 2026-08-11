@@ -100,8 +100,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {/* Left column sidebar panel */}
         <aside
           className={cn(
-            'absolute lg:relative z-20 h-full w-full lg:w-[380px] shrink-0 transition-transform duration-150 ease-out lg:translate-x-0 bg-bg-secondary border-r border-border-default transform-gpu',
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+            'absolute lg:relative z-20 h-full w-full lg:w-[380px] shrink-0 lg:translate-x-0 bg-bg-secondary border-r border-border-default',
+            isSidebarOpen ? 'block' : 'hidden lg:block'
           )}
         >
           <Sidebar />
@@ -110,7 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {/* Right column chat window panel */}
         <main
           className={cn(
-            'flex-1 h-full overflow-hidden transition-all duration-150 ease-out z-10 transform-gpu',
+            'flex-1 h-full overflow-hidden z-10',
             isSidebarOpen ? 'hidden lg:flex flex-col' : 'flex flex-col w-full lg:w-auto'
           )}
         >
