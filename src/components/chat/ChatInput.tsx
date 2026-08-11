@@ -464,7 +464,7 @@ export default function ChatInput({ onSendMessage, onTyping }: ChatInputProps) {
       {showPollModal && <PollModal onClose={() => setShowPollModal(false)} onSend={handleSendPoll} />}
       {showAIModal && <AIImageModal onClose={() => setShowAIModal(false)} onSend={handleSendAI} />}
 
-      <div className="h-auto bg-bg-secondary border-t border-border-default shrink-0 z-10">
+      <div className="h-auto bg-bg-secondary border-t border-border-default shrink-0 z-20 sticky bottom-0 pb-[env(safe-area-inset-bottom)] shadow-lg">
 
         {/* File Preview Bar */}
         {selectedFile && (

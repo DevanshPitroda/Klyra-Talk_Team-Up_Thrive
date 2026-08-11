@@ -1,7 +1,6 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Search, Plus } from 'lucide-react';
+import SidebarHeader from './SidebarHeader';
 import SidebarTabs from './SidebarTabs';
 import ChatList from '../chat/ChatList';
 import ContactSearch from './ContactSearch';
@@ -16,6 +15,9 @@ export default function Sidebar() {
 
   return (
     <div className="w-full h-full flex flex-col relative bg-bg-secondary select-none">
+      {/* Mobile & Sidebar Header Bar */}
+      <SidebarHeader onSearchClick={() => setIsSearchActive(true)} />
+
       {/* Discord-style Active Voice Channel Banner */}
       {activeMeetingRoomId && (
         <div className="bg-brand-green/15 border-b border-brand-green/30 px-4 py-2 flex items-center justify-between shrink-0">
