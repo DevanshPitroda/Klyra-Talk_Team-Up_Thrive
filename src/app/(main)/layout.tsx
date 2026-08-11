@@ -86,7 +86,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   if (!session) return null;
 
   return (
-    <div className="min-h-screen h-screen w-screen overflow-hidden flex bg-bg-primary text-text-primary">
+    <div className="h-[100dvh] w-full overflow-hidden flex bg-bg-primary text-text-primary touch-none">
       <LeftNav />
 
       {/* 
@@ -100,7 +100,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {/* Left column sidebar panel */}
         <aside
           className={cn(
-            'absolute lg:relative z-20 h-full w-full lg:w-[380px] shrink-0 transition-transform duration-200 lg:translate-x-0 bg-bg-secondary border-r border-border-default',
+            'absolute lg:relative z-20 h-full w-full lg:w-[380px] shrink-0 transition-transform duration-150 ease-out lg:translate-x-0 bg-bg-secondary border-r border-border-default transform-gpu',
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           )}
         >
@@ -110,7 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         {/* Right column chat window panel */}
         <main
           className={cn(
-            'flex-1 h-full overflow-hidden transition-all duration-200 z-10',
+            'flex-1 h-full overflow-hidden transition-all duration-150 ease-out z-10 transform-gpu',
             isSidebarOpen ? 'hidden lg:flex flex-col' : 'flex flex-col w-full lg:w-auto'
           )}
         >

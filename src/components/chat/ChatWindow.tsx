@@ -199,7 +199,7 @@ export default function ChatWindow() {
 
               <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto px-4 lg:px-6 py-4 flex flex-col gap-1.5 scroll-smooth select-text relative z-10"
+                className="flex-1 overflow-y-auto px-4 lg:px-6 py-4 flex flex-col gap-1.5 scroll-smooth select-text relative z-10 overscroll-y-contain transform-gpu webkit-overflow-scrolling-touch"
               >
                 {loading ? (
                   <div className="flex-1 flex items-center justify-center">
