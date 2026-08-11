@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
 :root {
+  --background: #111b21;
+  --foreground: #e9edef;
+  
+  --bg-primary: #111b21;
+  --bg-secondary: #1f2c34;
+  --bg-tertiary: #0b141a;
+  --bg-input: #2a3942;
+  
+  --bg-bubble-sent: #005c4b;
+  --bg-bubble-rcvd: #1f2c34;
+  
+  --accent-green: #00a884;
+  --accent-hover: #06cf9c;
+  
+  --text-primary: #e9edef;
+  --text-secondary: #8696a0;
+  --text-muted: #667781;
+  
+  --border-default: #2a3942;
+  --online-dot: #31c557;
+  --unread-badge: #00a884;
+}
+
+/* Light mode overrides */
+.light {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #111b21;
+  
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f2f5;
+  --bg-tertiary: #efeae2;
+  --bg-input: #f0f2f5;
+  
+  --bg-bubble-sent: #d9fdd3;
+  --bg-bubble-rcvd: #ffffff;
+  
+  --accent-green: #00a884;
+  --accent-hover: #06cf9c;
+  
+  --text-primary: #111b21;
+  --text-secondary: #667781;
+  --text-muted: #8696a0;
+  
+  --border-default: #e9edef;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-input: var(--bg-input);
+  --color-bubble-sent: var(--bg-bubble-sent);
+  --color-bubble-rcvd: var(--bg-bubble-rcvd);
+  --color-brand-green: var(--accent-green);
+  --color-brand-hover: var(--accent-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-default: var(--border-default);
+  --color-online-dot: var(--online-dot);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* WhatsApp Web Authentic Adaptive Doodle Pattern Wallpaper */
+.chat-doodle-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/doodle-pattern.png');
+  background-repeat: repeat;
+  background-position: center;
+  background-size: 400px;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Light Mode: WhatsApp Web light theme (#efeae2 background with soft dark doodle lines) */
+.light .chat-doodle-bg,
+[data-theme='light'] .chat-doodle-bg {
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  filter: contrast(110%) brightness(95%);
+}
+
+/* Dark Mode: WhatsApp Web dark theme (#0b141a background with soft warm/amber doodle lines) */
+.dark .chat-doodle-bg,
+[data-theme='dark'] .chat-doodle-bg {
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  filter: contrast(120%) brightness(1.1);
 }
