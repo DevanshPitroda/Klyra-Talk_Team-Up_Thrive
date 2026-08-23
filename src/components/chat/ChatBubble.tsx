@@ -639,7 +639,7 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
         {showPicker && (
           <div
             className={cn(
-              'absolute -top-8 z-20 border border-border-default/40 rounded-full px-2 py-1 flex items-center gap-1 shadow-lg animate-in fade-in duration-150 max-w-[calc(100vw-2rem)] overflow-x-auto whitespace-nowrap',
+              'absolute -top-8 z-30 border border-border-default/40 rounded-full px-2.5 py-1 flex items-center gap-1 shadow-xl animate-in fade-in duration-150 whitespace-nowrap',
               isMe ? 'right-0 sm:right-2' : 'left-0 sm:left-2'
             )}
             style={{ background: 'var(--bg-secondary)' }}
@@ -679,8 +679,12 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
             {/* Delete button */}
             <div className="relative">
               <button
-                onClick={() => setShowDeleteMenu((v) => !v)}
-                className="text-[10px] font-bold px-1 hover:text-red-400 transition-colors"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteMenu((v) => !v);
+                }}
+                className="text-[10px] font-bold px-1 hover:text-red-400 transition-colors cursor-pointer"
                 style={{ color: 'var(--text-secondary)' }}
                 title="Delete message"
               >
