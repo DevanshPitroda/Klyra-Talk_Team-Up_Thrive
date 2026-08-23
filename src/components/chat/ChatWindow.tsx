@@ -28,7 +28,8 @@ export default function ChatWindow() {
     const q = messageSearchQuery.toLowerCase();
     return activeMessages.filter((m) => {
       const bodyMatch = m.body?.toLowerCase().includes(q);
-      const senderMatch = m.senderId?.name?.toLowerCase().includes(q);
+      const senderName = typeof m.senderId === 'object' && m.senderId !== null ? m.senderId.name : '';
+      const senderMatch = senderName.toLowerCase().includes(q);
       const fileMatch = m.attachments?.some((a) => a.filename?.toLowerCase().includes(q));
       return bodyMatch || senderMatch || fileMatch;
     });

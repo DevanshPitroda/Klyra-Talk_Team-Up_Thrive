@@ -404,7 +404,7 @@ export default function RightInfoPanel() {
                     <div className="flex items-center gap-1.5">
                       <Pin className="w-3 h-3 text-amber-400" />
                       <span className="text-[11px] font-bold" style={{ color: 'var(--accent-green)' }}>
-                        {m.senderId.name}
+                        {typeof m.senderId === 'object' && m.senderId !== null ? m.senderId.name : 'User'}
                       </span>
                     </div>
                     <p className="text-xs leading-relaxed" style={{ color: 'var(--text-primary)' }}>

@@ -801,7 +801,7 @@ function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
               <span className="text-[10px] text-[#8696a0] font-mono">{time}</span>
               {isMe &&
                 (() => {
-                  const senderId = message.senderId._id;
+                  const senderId = typeof message.senderId === 'object' && message.senderId !== null ? message.senderId._id : String(message.senderId || '');
                   const isSeen = message.seenBy?.some((r) => r.userId !== senderId);
                   const isDelivered = message.deliveredTo?.some((r) => r.userId !== senderId);
 

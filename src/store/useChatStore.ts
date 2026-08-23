@@ -49,7 +49,7 @@ export interface IReactionDetail {
 export interface IMessageDetails {
   _id: string;
   conversationId: string;
-  senderId: {
+  senderId: string | {
     _id: string;
     name: string;
     image?: string;
@@ -221,7 +221,8 @@ export const useChatStore = create<ChatState>((set) => ({
     set((state) => {
       const chatMessages = state.messages[conversationId] || [];
       const updatedMessages = chatMessages.map((msg) => {
-        if (msg.senderId._id !== userId) {
+        const sId = typeof msg.senderId === 'object' && msg.senderId !== null ? msg.senderId._id : String(msg.senderId || '');
+        if (sId !== userId) {
           const delivered = msg.deliveredTo || [];
           if (!delivered.some((d) => d.userId === userId)) {
             return {
@@ -244,7 +245,8 @@ export const useChatStore = create<ChatState>((set) => ({
     set((state) => {
       const chatMessages = state.messages[conversationId] || [];
       const updatedMessages = chatMessages.map((msg) => {
-        if (msg.senderId._id !== userId) {
+        const sId = typeof msg.senderId === 'object' && msg.senderId !== null ? msg.senderId._id : String(msg.senderId || '');
+        if (sId !== userId) {
           const seen = msg.seenBy || [];
           const delivered = msg.deliveredTo || [];
           

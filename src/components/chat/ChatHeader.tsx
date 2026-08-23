@@ -267,7 +267,7 @@ export default function ChatHeader() {
           <div className="px-4 py-1.5 bg-amber-500/10 border-t border-amber-500/20 flex items-center justify-between text-xs text-amber-300">
             <div className="flex items-center gap-2 truncate">
               <span>📌</span>
-              <span className="font-bold shrink-0">{pinnedMessage.senderId.name}:</span>
+              <span className="font-bold shrink-0">{typeof pinnedMessage.senderId === 'object' && pinnedMessage.senderId !== null ? pinnedMessage.senderId.name : 'User'}:</span>
               <span className="truncate">{pinnedMessage.body || 'Attachment'}</span>
             </div>
           </div>
