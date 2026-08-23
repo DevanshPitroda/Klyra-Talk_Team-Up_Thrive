@@ -34,7 +34,16 @@ export async function POST(req: Request) {
 
     const filename = file.name;
     const size = file.size;
-    const mimeType = file.type;
+    const mimeType = file.type || '';
+
+    // Allowed categories: images, videos, audio, documents, text, archives
+    const DANGEROUS_EXTENSIONS = /\.(exe|bat|cmd|sh|php|pl|cgi|js|vbs|jar|scr|msi)$/i;
+    if (DANGEROUS_EXTENSIONS.test(filename)) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Executable file types are not allowed for upload security.' } },
+        { status: 422 }
+      );
+    }
 
     // Convert file to buffer for upload helper
     const bytes = await file.arrayBuffer();
