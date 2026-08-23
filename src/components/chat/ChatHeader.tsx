@@ -171,16 +171,7 @@ export default function ChatHeader() {
               </button>
             )}
 
-            {/* Settings (Direct only) */}
-            {isDirect && (
-              <button
-                onClick={() => setShowSettings(true)}
-                className="p-2 rounded-full transition cursor-pointer text-text-secondary hover:bg-bg-input hover:text-text-primary"
-                title="Chat Settings"
-              >
-                ⚙️
-              </button>
-            )}
+
 
             {/* Search Toggle */}
             <button
