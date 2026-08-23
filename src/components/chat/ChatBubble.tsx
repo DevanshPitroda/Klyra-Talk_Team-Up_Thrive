@@ -877,13 +877,4 @@ function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
   );
 }
 
-export default React.memo(ChatBubble, (prev, next) => {
-  return (
-    prev.message._id === next.message._id &&
-    prev.message.body === next.message.body &&
-    prev.message.isPinned === next.message.isPinned &&
-    prev.message.isDeleted === next.message.isDeleted &&
-    prev.message.reactions === next.message.reactions &&
-    prev.showSenderName === next.showSenderName
-  );
-});
+export default React.memo(ChatBubble);

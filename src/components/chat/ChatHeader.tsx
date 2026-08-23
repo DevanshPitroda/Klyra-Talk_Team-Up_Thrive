@@ -12,17 +12,15 @@ import ChatSettingsModal from './ChatSettingsModal';
 
 export default function ChatHeader() {
   const { data: session } = useSession();
-  const {
-    activeConversationId,
-    conversations,
-    onlineUserIds,
-    typingUsers,
-    messages,
-    setActiveMeetingRoomId,
-    updateConversation,
-    messageSearchQuery,
-    setMessageSearchQuery,
-  } = useChatStore();
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const conversations = useChatStore((state) => state.conversations);
+  const onlineUserIds = useChatStore((state) => state.onlineUserIds);
+  const messages = useChatStore((state) => state.messages);
+  const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
+  const updateConversation = useChatStore((state) => state.updateConversation);
+  const messageSearchQuery = useChatStore((state) => state.messageSearchQuery);
+  const setMessageSearchQuery = useChatStore((state) => state.setMessageSearchQuery);
+  const activeTyping = useChatStore((state) => (state.activeConversationId ? state.typingUsers[state.activeConversationId] || [] : []));
   const { setSidebarOpen, toggleRightInfo, isRightInfoOpen } = useUIStore();
 
   const conversation = conversations.find((c) => c._id === activeConversationId);
@@ -46,7 +44,6 @@ export default function ChatHeader() {
   const isDirect = conversation.type === 'direct';
   const isOnline = isDirect && conversation.members[0] ? onlineUserIds.has(conversation.members[0]._id) : false;
 
-  const activeTyping = activeConversationId ? typingUsers[activeConversationId] || [] : [];
   const isTyping = activeTyping.length > 0;
 
   let statusText = '';

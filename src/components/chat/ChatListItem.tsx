@@ -13,13 +13,15 @@ interface ChatListItemProps {
   onClick: () => void;
 }
 
+const EMPTY_TYPING: string[] = [];
+
 function ChatListItem({
   conversation,
   isActive,
   isOnline,
   onClick,
 }: ChatListItemProps) {
-  const activeTyping = useChatStore((state) => state.typingUsers[conversation._id] || []);
+  const activeTyping = useChatStore((state) => state.typingUsers[conversation._id] || EMPTY_TYPING);
   const lastMessage = conversation.lastMessage;
   const unreadCount = conversation.unreadCount;
 
