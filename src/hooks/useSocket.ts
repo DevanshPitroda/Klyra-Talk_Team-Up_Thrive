@@ -7,6 +7,27 @@ import { useChatStore } from '../store/useChatStore';
 
 let socketInstance: Socket | null = null;
 
+function resolveSocketUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  const envUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+  const isLocalhost =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.endsWith('.local');
+
+  if (isLocalhost) {
+    return envUrl || 'http://localhost:3001';
+  }
+
+  // In production: only connect if a valid remote URL (not localhost) is configured
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
+  }
+
+  return null;
+}
+
 export function useSocket() {
   const { data: session } = useSession();
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -15,16 +36,20 @@ export function useSocket() {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const SOCKET_URL =
-      process.env.NEXT_PUBLIC_SOCKET_URL ||
-      (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
+    const SOCKET_URL = resolveSocketUrl();
+
+    if (!SOCKET_URL) {
+      // Production without an external socket server URL configured
+      return;
+    }
 
     // 1. Create EXACTLY ONE socket instance per application lifecycle
     if (!socketInstance) {
       socketInstance = io(SOCKET_URL, {
         transports: ['websocket', 'polling'],
-        reconnectionDelay: 1000,
-        reconnectionAttempts: Infinity,
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 10000,
+        reconnectionAttempts: 5,
         reconnection: true,
         autoConnect: true,
       });
@@ -49,19 +74,24 @@ export function useSocket() {
     };
 
     const onConnectError = (err: Error) => {
-      console.warn('[Socket] Connection attempt (retrying in background):', err.message);
+      console.warn('[Socket] Connection attempt:', err.message);
       setIsConnected(false);
-      setIsReconnecting(true);
+      setIsReconnecting(false);
     };
 
     const onReconnectAttempt = () => {
       setIsReconnecting(true);
     };
 
+    const onReconnectFailed = () => {
+      setIsReconnecting(false);
+    };
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onConnectError);
     socket.io.on('reconnect_attempt', onReconnectAttempt);
+    socket.io.on('reconnect_failed', onReconnectFailed);
 
     if (socket.connected) {
       setIsConnected(true);
@@ -153,6 +183,7 @@ export function useSocket() {
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onConnectError);
       socket.io.off('reconnect_attempt', onReconnectAttempt);
+      socket.io.off('reconnect_failed', onReconnectFailed);
 
       socket.off('online_users', onOnlineUsers);
       socket.off('user_online', onUserOnline);
