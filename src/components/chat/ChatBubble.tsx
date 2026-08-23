@@ -688,19 +688,22 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
               </button>
               {showDeleteMenu && (
                 <div
-                  className="absolute z-30 rounded-xl shadow-xl border overflow-hidden min-w-[160px]"
+                  className="absolute z-50 rounded-xl shadow-2xl border overflow-hidden min-w-[165px]"
                   style={{
-                    top: '100%',
+                    bottom: '100%',
                     [isMe ? 'right' : 'left']: 0,
-                    marginTop: '4px',
+                    marginBottom: '6px',
                     background: 'var(--bg-secondary)',
                     borderColor: 'var(--border-default)',
                   }}
                 >
                   <button
-                    onClick={() => handleDelete('me')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete('me');
+                    }}
                     disabled={isDeleting}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left transition-colors hover:opacity-80"
+                    className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-left transition-colors font-semibold cursor-pointer"
                     style={{ color: 'var(--text-primary)', background: 'transparent' }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-input)')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
@@ -709,9 +712,12 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
                   </button>
                   {isMe && (
                     <button
-                      onClick={() => handleDelete('everyone')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete('everyone');
+                      }}
                       disabled={isDeleting}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-left transition-colors"
+                      className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-left transition-colors font-semibold border-t border-border-default/40 cursor-pointer"
                       style={{ color: '#ef4444', background: 'transparent' }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-input)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
