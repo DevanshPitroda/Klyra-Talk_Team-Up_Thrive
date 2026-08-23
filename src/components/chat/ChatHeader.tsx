@@ -211,6 +211,18 @@ export default function ChatHeader() {
               </svg>
             </button>
 
+            {/* Chat Settings Modal Trigger */}
+            <button
+              onClick={() => setShowSettings(true)}
+              className={cn(
+                'p-2 rounded-full transition cursor-pointer text-text-secondary hover:text-text-primary',
+                showSettings ? 'bg-brand-green/20 text-brand-green' : 'hover:bg-bg-input'
+              )}
+              title="Chat Settings"
+            >
+              <span className="text-xs">⚙️</span>
+            </button>
+
             {/* Info Panel Toggle (Three Dots) */}
             <button
               onClick={() => toggleRightInfo()}

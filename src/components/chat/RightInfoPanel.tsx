@@ -54,12 +54,18 @@ export default function RightInfoPanel() {
 
   return (
     <AnimatePresence>
+      {/* Mobile Backdrop Overlay (< xl) */}
+      <div
+        className="xl:hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+        onClick={() => setRightInfoOpen(false)}
+      />
+
       <motion.aside
         initial={{ x: 320, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 320, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="hidden xl:flex flex-col w-[320px] h-full shrink-0 border-l overflow-hidden select-none relative"
+        className="fixed inset-y-0 right-0 z-[9999] w-full max-w-[320px] sm:w-80 xl:static xl:z-auto flex flex-col h-full shrink-0 border-l overflow-hidden select-none relative shadow-2xl xl:shadow-none"
         style={{
           background: 'var(--bg-secondary)',
           borderColor: 'var(--border-default)',
