@@ -114,9 +114,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        if (user.id) token.id = user.id;
+        token.id = user.id || token.sub || '';
         token.role = (user.role || 'user') as 'user' | 'admin';
         if (user.image) token.picture = user.image;
+      }
+      if (!token.id && token.sub) {
+        token.id = token.sub;
       }
       if (trigger === 'update' && session?.image) {
         token.picture = session.image;
@@ -126,7 +129,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     async session({ session, token }) {
       if (token) {
-        session.user.id   = token.id as string;
+        session.user.id   = (token.id || token.sub || '') as string;
         session.user.role = (token.role as 'user' | 'admin') || 'user';
         if (token.picture) session.user.image = token.picture as string;
       }
