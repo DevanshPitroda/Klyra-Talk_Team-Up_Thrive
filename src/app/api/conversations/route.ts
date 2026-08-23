@@ -14,11 +14,11 @@ async function formatConversation(conv: any, currentUserId: mongoose.Types.Objec
 
   // Separate current user out of member previews for display purposes (especially direct chats)
   const otherMembers = membersList
-    .filter((m: any) => m.userId?._id.toString() !== currentUserId.toString())
+    .filter((m: any) => m.userId && m.userId._id && m.userId._id.toString() !== currentUserId.toString())
     .map((m: any) => m.userId);
 
   const currentMemberData = memberships.find(
-    (m) => m.conversationId.toString() === conv._id.toString()
+    (m) => m.conversationId && m.conversationId.toString() === conv._id.toString()
   );
 
   let lastMessage = conv.lastMessageId;
