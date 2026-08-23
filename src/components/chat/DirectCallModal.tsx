@@ -26,7 +26,7 @@ export default function DirectCallModal({
   onUpgradeToGroup,
 }: DirectCallModalProps) {
   const { data: session } = useSession();
-  const { conversations } = useChatStore();
+  const conversations = useChatStore((state) => state.conversations);
 
   const [callStatus, setCallStatus] = useState<'calling' | 'connected' | 'ended'>('calling');
   const [micMuted, setMicMuted] = useState(false);

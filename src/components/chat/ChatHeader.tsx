@@ -22,8 +22,12 @@ export default function ChatHeader() {
   const updateConversation = useChatStore((state) => state.updateConversation);
   const messageSearchQuery = useChatStore((state) => state.messageSearchQuery);
   const setMessageSearchQuery = useChatStore((state) => state.setMessageSearchQuery);
-  const activeTyping = useChatStore((state) => (state.activeConversationId ? state.typingUsers[state.activeConversationId] || EMPTY_ARRAY : EMPTY_ARRAY));
-  const { setSidebarOpen, toggleRightInfo, isRightInfoOpen } = useUIStore();
+  const activeTyping = useChatStore((state) =>
+    state.activeConversationId ? state.typingUsers[state.activeConversationId] || EMPTY_ARRAY : EMPTY_ARRAY
+  );
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
+  const toggleRightInfo = useUIStore((state) => state.toggleRightInfo);
+  const isRightInfoOpen = useUIStore((state) => state.isRightInfoOpen);
 
   const conversation = conversations.find((c) => c._id === activeConversationId);
 

@@ -21,7 +21,9 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<IUserSearchItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const { setActiveConversationId, setConversations, conversations } = useChatStore();
+  const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
+  const setConversations = useChatStore((state) => state.setConversations);
+  const conversations = useChatStore((state) => state.conversations);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { useUIStore } from '../../store/useUIStore';
 
 export default function SidebarTabs() {
-  const { activeTab, setActiveTab } = useUIStore();
+  const activeTab = useUIStore((state) => state.activeTab);
+  const setActiveTab = useUIStore((state) => state.setActiveTab);
 
   const filterChips: Array<{ id: 'chats' | 'groups'; label: string }> = [
     { id: 'chats', label: 'All' },

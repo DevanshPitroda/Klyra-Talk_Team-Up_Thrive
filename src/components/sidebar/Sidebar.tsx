@@ -13,7 +13,8 @@ import { useUIStore } from '../../store/useUIStore';
 export default function Sidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const { activeMeetingRoomId, setActiveMeetingRoomId } = useChatStore();
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
+  const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
 
   return (
     <div className="w-full h-full flex flex-col relative bg-bg-secondary select-none">

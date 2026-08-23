@@ -13,8 +13,10 @@ interface MeetingHeaderProps {
 
 export default function MeetingHeader({ onLeave, onEndMeeting }: MeetingHeaderProps) {
   const { data: session } = useSession();
-  const { currentRoom, currentUserRole, members } = useStudyRoomStore();
-  const { activeMeetingRoomId } = useChatStore();
+  const currentRoom = useStudyRoomStore((state) => state.currentRoom);
+  const currentUserRole = useStudyRoomStore((state) => state.currentUserRole);
+  const members = useStudyRoomStore((state) => state.members);
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
   const [seconds, setSeconds] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
 

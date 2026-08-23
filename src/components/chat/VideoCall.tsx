@@ -144,7 +144,7 @@ export default function VideoCall({
   onScreenShareToggle,
 }: VideoCallProps) {
   const { data: session } = useSession();
-  const { activeMeetingRoomId } = useChatStore();
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
 
   const [peers, setPeers] = useState<Map<string, Peer>>(new Map());
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);

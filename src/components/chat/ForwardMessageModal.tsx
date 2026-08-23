@@ -14,7 +14,9 @@ interface ForwardMessageModalProps {
 
 export default function ForwardMessageModal({ message, isOpen, onClose }: ForwardMessageModalProps) {
   const { data: session } = useSession();
-  const { conversations, addMessage, updateConversationLastMessage } = useChatStore();
+  const conversations = useChatStore((state) => state.conversations);
+  const addMessage = useChatStore((state) => state.addMessage);
+  const updateConversationLastMessage = useChatStore((state) => state.updateConversationLastMessage);
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sending, setSending] = useState(false);

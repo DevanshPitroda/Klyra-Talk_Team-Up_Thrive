@@ -13,17 +13,25 @@ import ForwardMessageModal from './ForwardMessageModal';
 import { formatRelativeTime } from '../../utils/formatDate';
 import { getSocket } from '../../hooks/useSocket';
 
+const EMPTY_MESSAGES: IMessageDetails[] = [];
+
 export default function ChatWindow() {
   const { data: session } = useSession();
-  const { activeConversationId, messages, setMessages, addMessage, activeMeetingRoomId, messageSearchQuery } = useChatStore();
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
+  const messageSearchQuery = useChatStore((state) => state.messageSearchQuery);
+  const setMessages = useChatStore((state) => state.setMessages);
+  const addMessage = useChatStore((state) => state.addMessage);
+
+  const activeMessages = useChatStore((state) =>
+    state.activeConversationId ? state.messages[state.activeConversationId] || EMPTY_MESSAGES : EMPTY_MESSAGES
+  );
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
   const [forwardMsg, setForwardMsg] = useState<IMessageDetails | null>(null);
   const [isForwardOpen, setIsForwardOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const activeMessages = activeConversationId ? messages[activeConversationId] || [] : [];
 
   const displayMessages = useMemo(() => {
     if (!messageSearchQuery.trim()) return activeMessages;

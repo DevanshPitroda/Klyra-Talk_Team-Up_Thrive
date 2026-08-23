@@ -17,7 +17,9 @@ interface CreateGroupModalProps {
 }
 
 export default function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
-  const { conversations, setConversations, setActiveConversationId } = useChatStore();
+  const conversations = useChatStore((state) => state.conversations);
+  const setConversations = useChatStore((state) => state.setConversations);
+  const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [contacts, setContacts] = useState<Contact[]>([]);

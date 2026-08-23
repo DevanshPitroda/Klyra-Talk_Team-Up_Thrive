@@ -24,8 +24,14 @@ interface StudyRoomProps {
 
 export default function StudyRoom({ conversationId }: StudyRoomProps) {
   const { data: session } = useSession();
-  const { setActiveMeetingRoomId, setActiveMeetingRoomUrl } = useChatStore();
-  const { setCurrentRoom, setMembers, resetRoomState, updateMember, removeMember, currentUserRole } = useStudyRoomStore();
+  const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
+  const setActiveMeetingRoomUrl = useChatStore((state) => state.setActiveMeetingRoomUrl);
+  const setCurrentRoom = useStudyRoomStore((state) => state.setCurrentRoom);
+  const setMembers = useStudyRoomStore((state) => state.setMembers);
+  const resetRoomState = useStudyRoomStore((state) => state.resetRoomState);
+  const updateMember = useStudyRoomStore((state) => state.updateMember);
+  const removeMember = useStudyRoomStore((state) => state.removeMember);
+  const currentUserRole = useStudyRoomStore((state) => state.currentUserRole);
 
   const [micMuted, setMicMuted] = useState(true);
   const [videoOff, setVideoOff] = useState(true);

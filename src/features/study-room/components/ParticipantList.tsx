@@ -7,8 +7,10 @@ import { getSocket } from '@/hooks/useSocket';
 import { useChatStore } from '@/store/useChatStore';
 
 export default function ParticipantList() {
-  const { members, currentUserRole, updateMember } = useStudyRoomStore();
-  const { activeMeetingRoomId } = useChatStore();
+  const members = useStudyRoomStore((state) => state.members);
+  const currentUserRole = useStudyRoomStore((state) => state.currentUserRole);
+  const updateMember = useStudyRoomStore((state) => state.updateMember);
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
 
   const isHostOrCoHost = currentUserRole === 'host' || currentUserRole === 'co-host';
   const raisedHandMembers = members.filter((m) => m.isHandRaised);

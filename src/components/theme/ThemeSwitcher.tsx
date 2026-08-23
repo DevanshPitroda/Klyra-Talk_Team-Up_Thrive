@@ -10,7 +10,10 @@ interface ThemeSwitcherProps {
 }
 
 export default function ThemeSwitcher({ isOpen, onClose }: ThemeSwitcherProps) {
-  const { themeId, mode, setThemeId, setMode } = useThemeStore();
+  const themeId = useThemeStore((state) => state.themeId);
+  const mode = useThemeStore((state) => state.mode);
+  const setThemeId = useThemeStore((state) => state.setThemeId);
+  const setMode = useThemeStore((state) => state.setMode);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   if (!isOpen) return null;

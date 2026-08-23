@@ -32,10 +32,12 @@ import CreateGroupModal from '../group/CreateGroupModal';
 
 export default function LeftNav() {
   const { data: session } = useSession();
-  const { conversations } = useChatStore();
-  const { activeTab, setActiveTab } = useUIStore();
-  const { setIsCreationModalOpen } = useStudyRoomStore();
-  const { mode, setMode } = useThemeStore();
+  const conversations = useChatStore((state) => state.conversations);
+  const activeTab = useUIStore((state) => state.activeTab);
+  const setActiveTab = useUIStore((state) => state.setActiveTab);
+  const setIsCreationModalOpen = useStudyRoomStore((state) => state.setIsCreationModalOpen);
+  const mode = useThemeStore((state) => state.mode);
+  const setMode = useThemeStore((state) => state.setMode);
 
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [activeNavItem, setActiveNavItem] = useState<string>('chats');

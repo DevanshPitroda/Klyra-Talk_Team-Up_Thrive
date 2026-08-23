@@ -5,7 +5,8 @@ import { useThemeStore } from '../store/useThemeStore';
 import { ALL_THEMES } from '../lib/themes';
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { themeId, mode } = useThemeStore();
+  const themeId = useThemeStore((state) => state.themeId);
+  const mode = useThemeStore((state) => state.mode);
 
   useEffect(() => {
     const theme = ALL_THEMES.find((t) => t.id === themeId);

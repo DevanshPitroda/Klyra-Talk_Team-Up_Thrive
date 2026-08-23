@@ -18,8 +18,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const { setConversations, setActiveConversationId } = useChatStore();
-  const { isSidebarOpen, setSidebarOpen } = useUIStore();
+  const setConversations = useChatStore((state) => state.setConversations);
+  const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
+  const isSidebarOpen = useUIStore((state) => state.isSidebarOpen);
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
 
   // Initialise Socket.IO connection for real-time events & track reconnect status
   const { isReconnecting } = useSocket();

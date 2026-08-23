@@ -22,9 +22,17 @@ import { useChatStore } from '../../store/useChatStore';
 import { useUIStore } from '../../store/useUIStore';
 import Avatar from '../ui/Avatar';
 
+const EMPTY_MESSAGES: any[] = [];
+
 export default function RightInfoPanel() {
-  const { activeConversationId, conversations, messages, onlineUserIds } = useChatStore();
-  const { isRightInfoOpen, setRightInfoOpen } = useUIStore();
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const conversations = useChatStore((state) => state.conversations);
+  const onlineUserIds = useChatStore((state) => state.onlineUserIds);
+  const chatMessages = useChatStore((state) =>
+    state.activeConversationId ? state.messages[state.activeConversationId] || EMPTY_MESSAGES : EMPTY_MESSAGES
+  );
+  const isRightInfoOpen = useUIStore((state) => state.isRightInfoOpen);
+  const setRightInfoOpen = useUIStore((state) => state.setRightInfoOpen);
   const [activeTab, setActiveTab] = useState<'info' | 'files' | 'media' | 'pinned'>('info');
 
   const [notifications, setNotifications] = useState(true);
@@ -43,7 +51,6 @@ export default function RightInfoPanel() {
   const chatName = conv.name || conv.members[0]?.name || 'Chat';
   const chatImage = conv.image || conv.members[0]?.image;
 
-  const chatMessages = messages[activeConversationId] || [];
   const mediaMessages = chatMessages.filter(
     (m) => m.attachments && m.attachments.length > 0 && m.attachments[0].mimeType?.startsWith('image/')
   );

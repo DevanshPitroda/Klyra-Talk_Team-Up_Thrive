@@ -28,8 +28,8 @@ interface Poll {
 
 export default function PollsPanel() {
   const { data: session } = useSession();
-  const { currentUserRole } = useStudyRoomStore();
-  const { activeMeetingRoomId } = useChatStore();
+  const currentUserRole = useStudyRoomStore((state) => state.currentUserRole);
+  const activeMeetingRoomId = useChatStore((state) => state.activeMeetingRoomId);
   const isHost = currentUserRole === 'host' || currentUserRole === 'co-host';
 
   const [polls, setPolls] = useState<Poll[]>([]);

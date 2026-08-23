@@ -10,8 +10,12 @@ interface ChatListProps {
 }
 
 export default function ChatList({ searchQuery }: ChatListProps) {
-  const { conversations, activeConversationId, setActiveConversationId, onlineUserIds } = useChatStore();
-  const { activeTab, setSidebarOpen } = useUIStore();
+  const conversations = useChatStore((state) => state.conversations);
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
+  const onlineUserIds = useChatStore((state) => state.onlineUserIds);
+  const activeTab = useUIStore((state) => state.activeTab);
+  const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
 
   const handleChatClick = (conversationId: string) => {
     setActiveConversationId(conversationId);

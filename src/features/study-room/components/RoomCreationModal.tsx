@@ -10,9 +10,12 @@ import { useSession } from 'next-auth/react';
 
 export default function RoomCreationModal() {
   const { data: session } = useSession();
-  const { isCreationModalOpen, setIsCreationModalOpen, setCurrentRoom, setCurrentUserRole } =
-    useStudyRoomStore();
-  const { activeConversationId, setActiveMeetingRoomId } = useChatStore();
+  const isCreationModalOpen = useStudyRoomStore((state) => state.isCreationModalOpen);
+  const setIsCreationModalOpen = useStudyRoomStore((state) => state.setIsCreationModalOpen);
+  const setCurrentRoom = useStudyRoomStore((state) => state.setCurrentRoom);
+  const setCurrentUserRole = useStudyRoomStore((state) => state.setCurrentUserRole);
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
 
   const [name, setName] = useState(`${session?.user?.name || 'User'}'s Study Room`);
   const [password, setPassword] = useState('');

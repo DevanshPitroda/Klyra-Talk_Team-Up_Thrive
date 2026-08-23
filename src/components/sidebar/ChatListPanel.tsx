@@ -34,7 +34,10 @@ function getLastMsgPreview(conv: IConversationPreview) {
 
 export default function ChatListPanel() {
   const { data: session } = useSession();
-  const { conversations, activeConversationId, setActiveConversationId, onlineUserIds } = useChatStore();
+  const conversations = useChatStore((state) => state.conversations);
+  const activeConversationId = useChatStore((state) => state.activeConversationId);
+  const setActiveConversationId = useChatStore((state) => state.setActiveConversationId);
+  const onlineUserIds = useChatStore((state) => state.onlineUserIds);
   const [search, setSearch] = useState('');
 
   const myId = session?.user?.id;
