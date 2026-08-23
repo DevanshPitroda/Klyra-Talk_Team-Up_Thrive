@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useChatStore } from '../../store/useChatStore';
 
 interface ChatSettingsModalProps {
@@ -19,8 +20,19 @@ export default function ChatSettingsModal({
   const [timer, setTimer] = useState<'off' | '24h' | 'view_once'>(currentTimer || 'off');
   const [isSaving, setIsSaving] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimer(currentTimer || 'off');
+    }
+  }, [isOpen, currentTimer]);
+
+  if (!isOpen || !mounted) return null;
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -71,8 +83,8 @@ export default function ChatSettingsModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm select-none" onClick={(e) => e.target === e.currentTarget && onClose()}>
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none pointer-events-auto" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-bg-secondary w-full max-w-sm rounded-2xl shadow-2xl border border-border-default/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         <div className="p-4 border-b border-border-default/40 flex justify-between items-center bg-bg-primary/40">
           <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
@@ -181,4 +193,6 @@ export default function ChatSettingsModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
