@@ -106,7 +106,9 @@ export default function DirectCallModal({
 
   const handleEndCall = () => {
     setCallStatus('ended');
+    getSocket()?.emit('direct_call:end', { targetUserId: targetUser._id });
     localStreamRef.current?.getTracks().forEach((t) => t.stop());
+    localStreamRef.current = null;
     onClose();
   };
 

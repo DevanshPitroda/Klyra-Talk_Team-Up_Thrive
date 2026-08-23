@@ -109,7 +109,10 @@ export default function ChatHeader() {
           <div className="flex items-center gap-3 min-w-0">
             {/* Mobile Back button */}
             <button
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => {
+                useChatStore.getState().setActiveConversationId(null);
+                setSidebarOpen(true);
+              }}
               className="lg:hidden p-1.5 hover:bg-bg-input rounded-full text-text-secondary hover:text-text-primary transition mr-1 cursor-pointer"
             >
               <svg

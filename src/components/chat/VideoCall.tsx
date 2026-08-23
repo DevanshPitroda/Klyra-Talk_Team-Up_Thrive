@@ -444,6 +444,10 @@ export default function VideoCall({
 
   useEffect(() => {
     return () => {
+      const socket = getSocket();
+      if (socket && conversationId) {
+        socket.emit('room:leave', { roomId: conversationId });
+      }
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
       screenStreamRef.current?.getTracks().forEach((t) => t.stop());

@@ -28,7 +28,8 @@ export function useSocket() {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 
+      (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
 
     // Reuse existing connection if available
     if (!socketInstance || !socketInstance.connected) {
@@ -134,6 +135,8 @@ export function useSocket() {
       socket.off('new_message');
       socket.off('messages_delivered');
       socket.off('messages_seen');
+      socket.off('message_reaction');
+      socket.off('message_pin');
       socket.off('typing_start');
       socket.off('typing_stop');
     };
