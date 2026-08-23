@@ -103,7 +103,12 @@ function ChatListItem({
                 : "text-text-secondary"
           )}>
             {lastMessage && conversation.type === 'group' && !isTypingPreview && (
-              <span className="text-text-muted mr-1">{lastMessage.senderId.name}:</span>
+              <span className="text-text-muted mr-1">
+                {typeof lastMessage.senderId === 'object' && lastMessage.senderId !== null
+                  ? lastMessage.senderId.name || 'User'
+                  : 'User'}
+                :
+              </span>
             )}
             {messagePreview}
           </p>

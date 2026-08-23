@@ -20,6 +20,12 @@ export async function GET(
   }
 
   const { conversationId } = await params;
+  if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+    return NextResponse.json(
+      { success: false, error: { code: 'INVALID_ID', message: 'Invalid conversation ID' } },
+      { status: 400 }
+    );
+  }
 
   try {
     await connectDB();
@@ -64,6 +70,12 @@ export async function POST(
   }
 
   const { conversationId } = await params;
+  if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+    return NextResponse.json(
+      { success: false, error: { code: 'INVALID_ID', message: 'Invalid conversation ID' } },
+      { status: 400 }
+    );
+  }
 
   try {
     const { body, type, attachments, replyToId, viewOnce, pollData } = await req.json();
@@ -162,6 +174,12 @@ export async function DELETE(
   }
 
   const { conversationId } = await params;
+  if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+    return NextResponse.json(
+      { success: false, error: { code: 'INVALID_ID', message: 'Invalid conversation ID' } },
+      { status: 400 }
+    );
+  }
 
   try {
     await connectDB();

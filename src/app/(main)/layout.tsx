@@ -69,7 +69,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     if (chatIndex !== -1 && parts[chatIndex + 1]) {
       setActiveConversationId(parts[chatIndex + 1]);
       setSidebarOpen(false); // Autofocus chat window on mobile viewport
-    } else {
+    } else if (!pathname.startsWith('/chat')) {
       setActiveConversationId(null);
       setSidebarOpen(true);
     }

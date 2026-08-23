@@ -17,6 +17,8 @@ export default function ChatWindow() {
   const { data: session } = useSession();
   const { activeConversationId, messages, setMessages, addMessage, activeMeetingRoomId, messageSearchQuery } = useChatStore();
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [retryTrigger, setRetryTrigger] = useState(0);
   const [forwardMsg, setForwardMsg] = useState<IMessageDetails | null>(null);
   const [isForwardOpen, setIsForwardOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -35,25 +37,67 @@ export default function ChatWindow() {
     });
   }, [activeMessages, messageSearchQuery]);
 
-  // 1. Fetch conversation messages on chat switch
+  // 1. Fetch conversation messages on chat switch with AbortController & race condition guard
   useEffect(() => {
     if (!activeConversationId) return;
+
+    const controller = new AbortController();
+    let isCurrent = true;
+
     const fetchMessages = async () => {
-      setLoading(true);
+      // Preserve cached messages: only show full loading spinner if no cached messages exist
+      const existingMessages = useChatStore.getState().messages[activeConversationId];
+      if (!existingMessages || existingMessages.length === 0) {
+        setLoading(true);
+      }
+      setFetchError(null);
+
       try {
-        const res = await fetch(`/api/conversations/${activeConversationId}/messages`);
-        const data = await res.json();
-        if (data.success) {
-          setMessages(activeConversationId, [...data.data].reverse());
+        const res = await fetch(`/api/conversations/${activeConversationId}/messages`, {
+          signal: controller.signal,
+        });
+
+        if (!isCurrent) return;
+
+        if (res.status === 200) {
+          const data = await res.json();
+          if (data.success && isCurrent) {
+            setMessages(activeConversationId, [...data.data].reverse());
+            setFetchError(null);
+          }
+        } else if (res.status === 401) {
+          // Authentication check on route - log warning without crashing the client state
+          console.warn('[ChatWindow] Message fetch unauthorized (401)');
+        } else if (res.status === 403) {
+          setFetchError('You are not a member of this conversation.');
+        } else if (res.status === 404) {
+          setFetchError('Conversation not found.');
+        } else {
+          setFetchError('Unable to load latest messages. Tap retry.');
         }
-      } catch (err) {
-        console.error('Failed to load messages:', err);
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          // Request was cleanly aborted due to rapid chat switch - ignore
+          return;
+        }
+        if (isCurrent) {
+          console.warn('[ChatWindow] Network issue loading messages:', err.message);
+          setFetchError('Connection glitch. Tap to retry loading messages.');
+        }
       } finally {
-        setLoading(false);
+        if (isCurrent) {
+          setLoading(false);
+        }
       }
     };
+
     fetchMessages();
-  }, [activeConversationId, setMessages]);
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
+  }, [activeConversationId, setMessages, retryTrigger]);
 
   // 2. Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -200,6 +244,19 @@ export default function ChatWindow() {
         ) : (
           <>
             <ChatHeader />
+
+            {/* Non-intrusive inline retry banner */}
+            {fetchError && (
+              <div className="px-4 py-2 bg-amber-500/15 border-b border-amber-500/30 flex items-center justify-between text-xs text-amber-300 z-20 shrink-0 select-none">
+                <span className="truncate">⚠️ {fetchError}</span>
+                <button
+                  onClick={() => setRetryTrigger((n) => n + 1)}
+                  className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-bold rounded-lg transition text-[11px] shrink-0 cursor-pointer ml-2"
+                >
+                  🔄 Retry
+                </button>
+              </div>
+            )}
 
             {/* Message scroll area with adaptive WhatsApp doodle background */}
             <div className="flex-1 relative overflow-hidden flex flex-col" style={{ background: 'var(--bg-tertiary)' }}>
