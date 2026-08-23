@@ -255,32 +255,8 @@ export default function LeftNav() {
               )}
             </div>
 
-            {/* Theme Switcher Button */}
-            <div className="relative group/act">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsThemeOpen(true)}
-                className="p-2 rounded-lg transition-colors cursor-pointer"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                <Palette className="w-4 h-4 hover:text-[var(--accent-green)]" />
-              </motion.button>
-              {isCollapsed && (
-                <div className="absolute left-[56px] top-1/2 -translate-y-1/2 z-50 pointer-events-none opacity-0 group-hover/act:opacity-100 group-hover/act:translate-x-0 -translate-x-2 transition-all duration-200 ease-out whitespace-nowrap">
-                  <div
-                    className="px-3 py-1.5 rounded-xl text-xs font-bold shadow-xl border backdrop-blur-md"
-                    style={{
-                      background: 'var(--bg-primary)',
-                      borderColor: 'var(--border-default)',
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    Theme Catalog 🎨
-                  </div>
-                </div>
-              )}
-            </div>
+
+
 
             {/* Create Group Button */}
             <div className="relative group/act">
