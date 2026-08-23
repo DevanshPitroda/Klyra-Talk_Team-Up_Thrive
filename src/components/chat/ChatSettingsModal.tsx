@@ -16,18 +16,13 @@ export default function ChatSettingsModal({
   currentTimer,
   onTimerChange
 }: ChatSettingsModalProps) {
-  const [timer, setTimer] = useState(currentTimer || 'off');
+  const [timer, setTimer] = useState<'off' | '24h' | 'view_once'>(currentTimer || 'off');
   const [isSaving, setIsSaving] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    if (timer === currentTimer) {
-      onClose();
-      return;
-    }
-
     setIsSaving(true);
     try {
       const res = await fetch(`/api/conversations/${conversationId}/settings`, {
@@ -38,6 +33,10 @@ export default function ChatSettingsModal({
       const data = await res.json();
       
       if (data.success) {
+        const store = useChatStore.getState();
+        store.setConversations(
+          store.conversations.map((c) => (c._id === conversationId ? { ...c, disappearingTimer: timer } : c))
+        );
         onTimerChange(timer);
         onClose();
       } else {
@@ -73,72 +72,88 @@ export default function ChatSettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-bg-secondary w-full max-w-sm rounded-2xl shadow-xl border border-border-default overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-5 border-b border-border-default flex justify-between items-center">
-          <h2 className="text-lg font-bold text-text-primary flex items-center gap-2">
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm select-none" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-bg-secondary w-full max-w-sm rounded-2xl shadow-2xl border border-border-default/60 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-4 border-b border-border-default/40 flex justify-between items-center bg-bg-primary/40">
+          <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
             ⚙️ Chat Settings
           </h2>
-          <button onClick={onClose} className="text-text-secondary hover:text-text-primary text-xl">&times;</button>
+          <button onClick={onClose} className="p-1 hover:bg-bg-input text-text-secondary hover:text-text-primary rounded-lg text-lg transition cursor-pointer">&times;</button>
         </div>
         
-        <div className="p-5 space-y-4">
+        <div className="p-4 space-y-4">
           <div>
-            <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
+            <h3 className="text-xs font-bold text-text-primary mb-1 flex items-center gap-1.5">
               🕛 Disappearing Messages
             </h3>
-            <p className="text-xs text-text-secondary mb-3">
-              Make new messages in this chat disappear after the selected time.
+            <p className="text-[11px] text-text-secondary mb-3 leading-relaxed">
+              New messages in this chat will disappear after the selected duration.
             </p>
             
             <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-border-default bg-bg-primary hover:bg-bg-hover cursor-pointer transition-colors">
-                <input 
-                  type="radio" 
-                  name="disappearingTimer" 
-                  value="off"
-                  checked={timer === 'off'}
-                  onChange={() => setTimer('off')}
-                  className="accent-brand-green w-4 h-4"
-                />
-                <span className="text-sm text-text-primary font-medium">Off (Never)</span>
-              </label>
-              
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-border-default bg-bg-primary hover:bg-bg-hover cursor-pointer transition-colors">
-                <input 
-                  type="radio" 
-                  name="disappearingTimer" 
-                  value="24h"
-                  checked={timer === '24h'}
-                  onChange={() => setTimer('24h')}
-                  className="accent-brand-green w-4 h-4"
-                />
-                <span className="text-sm text-text-primary font-medium">24 Hours</span>
-              </label>
-              
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-border-default bg-bg-primary hover:bg-bg-hover cursor-pointer transition-colors">
-                <input 
-                  type="radio" 
-                  name="disappearingTimer" 
-                  value="view_once"
-                  checked={timer === 'view_once'}
-                  onChange={() => setTimer('view_once')}
-                  className="accent-brand-green w-4 h-4"
-                />
-                <div>
-                  <span className="text-sm text-text-primary font-medium block">After Viewing (View Once)</span>
-                  <span className="text-xs text-text-secondary block">Messages will be hidden immediately after they are read.</span>
+              {/* Option 1: Off */}
+              <button
+                type="button"
+                onClick={() => setTimer('off')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  timer === 'off'
+                    ? 'border-brand-green bg-brand-green/10 text-brand-green font-bold'
+                    : 'border-border-default/40 bg-bg-primary hover:bg-bg-input text-text-primary'
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${timer === 'off' ? 'border-brand-green bg-brand-green' : 'border-border-default'}`}>
+                  {timer === 'off' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                 </div>
-              </label>
+                <span className="text-xs font-semibold">Off (Keep messages permanently)</span>
+              </button>
+
+              {/* Option 2: 24 Hours */}
+              <button
+                type="button"
+                onClick={() => setTimer('24h')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  timer === '24h'
+                    ? 'border-brand-green bg-brand-green/10 text-brand-green font-bold'
+                    : 'border-border-default/40 bg-bg-primary hover:bg-bg-input text-text-primary'
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${timer === '24h' ? 'border-brand-green bg-brand-green' : 'border-border-default'}`}>
+                  {timer === '24h' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                </div>
+                <div>
+                  <span className="text-xs font-semibold block">24 Hours</span>
+                  <span className="text-[10px] text-text-secondary block font-normal">Messages self-destruct 24h after sending.</span>
+                </div>
+              </button>
+
+              {/* Option 3: View Once */}
+              <button
+                type="button"
+                onClick={() => setTimer('view_once')}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                  timer === 'view_once'
+                    ? 'border-brand-green bg-brand-green/10 text-brand-green font-bold'
+                    : 'border-border-default/40 bg-bg-primary hover:bg-bg-input text-text-primary'
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${timer === 'view_once' ? 'border-brand-green bg-brand-green' : 'border-border-default'}`}>
+                  {timer === 'view_once' && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                </div>
+                <div>
+                  <span className="text-xs font-semibold block">After Viewing (View Once)</span>
+                  <span className="text-[10px] text-text-secondary block font-normal">Messages disappear immediately after reading.</span>
+                </div>
+              </button>
             </div>
           </div>
 
           {/* Clear Chat Button Section */}
-          <div className="pt-3 border-t border-border-default">
+          <div className="pt-3 border-t border-border-default/40">
             <button
+              type="button"
               onClick={handleClearChat}
               disabled={isClearing}
-              className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold text-xs border border-red-500/20 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs border border-red-500/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               <span>🗑️</span>
               <span>{isClearing ? 'Clearing...' : 'Clear Chat History'}</span>
@@ -146,14 +161,19 @@ export default function ChatSettingsModal({
           </div>
         </div>
 
-        <div className="p-4 bg-bg-primary border-t border-border-default flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:bg-bg-hover transition-colors font-medium text-sm">
+        <div className="p-3 bg-bg-primary/40 border-t border-border-default/40 flex justify-end gap-2">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="px-3.5 py-1.5 rounded-xl text-text-secondary hover:bg-bg-input transition-colors font-bold text-xs cursor-pointer"
+          >
             Cancel
           </button>
           <button 
+            type="button" 
             onClick={handleSave} 
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg bg-brand-green hover:bg-brand-hover text-white transition-colors font-semibold text-sm disabled:opacity-50"
+            className="px-4 py-1.5 rounded-xl bg-brand-green hover:bg-brand-hover text-white transition-all font-bold text-xs cursor-pointer disabled:opacity-50 shadow-sm"
           >
             {isSaving ? 'Saving...' : 'Save Settings'}
           </button>
