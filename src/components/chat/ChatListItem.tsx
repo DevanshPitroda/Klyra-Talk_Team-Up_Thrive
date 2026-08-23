@@ -13,13 +13,13 @@ interface ChatListItemProps {
   onClick: () => void;
 }
 
-export default function ChatListItem({
+function ChatListItem({
   conversation,
   isActive,
   isOnline,
   onClick,
 }: ChatListItemProps) {
-  const { typingUsers } = useChatStore();
+  const activeTyping = useChatStore((state) => state.typingUsers[conversation._id] || []);
   const lastMessage = conversation.lastMessage;
   const unreadCount = conversation.unreadCount;
 
@@ -28,7 +28,6 @@ export default function ChatListItem({
   const chatImage = conversation.image || conversation.members[0]?.image;
 
   // Check if someone is currently typing in this conversation
-  const activeTyping = typingUsers[conversation._id] || [];
   const isTyping = activeTyping.length > 0;
 
   // Format message preview
@@ -116,3 +115,5 @@ export default function ChatListItem({
     </div>
   );
 }
+
+export default React.memo(ChatListItem);

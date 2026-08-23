@@ -13,9 +13,11 @@ interface ChatBubbleProps {
   onForward?: (message: IMessageDetails) => void;
 }
 
-export default function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
+function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
   const { data: session } = useSession();
-  const { updateMessage, removeMessage, setActiveMeetingRoomId } = useChatStore();
+  const updateMessage = useChatStore((state) => state.updateMessage);
+  const removeMessage = useChatStore((state) => state.removeMessage);
+  const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
   const [showFullEmojiPicker, setShowFullEmojiPicker] = useState(false);
   
   const isMe = session?.user?.id === message.senderId._id;
@@ -874,3 +876,14 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
     </>
   );
 }
+
+export default React.memo(ChatBubble, (prev, next) => {
+  return (
+    prev.message._id === next.message._id &&
+    prev.message.body === next.message.body &&
+    prev.message.isPinned === next.message.isPinned &&
+    prev.message.isDeleted === next.message.isDeleted &&
+    prev.message.reactions === next.message.reactions &&
+    prev.showSenderName === next.showSenderName
+  );
+});
