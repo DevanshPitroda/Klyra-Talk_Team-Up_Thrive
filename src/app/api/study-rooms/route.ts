@@ -83,11 +83,12 @@ export async function POST(req: Request) {
     const roomData = room.toObject();
     delete roomData.password;
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin') || 'https://klyra-talk-team-up-thrive.vercel.app';
     return NextResponse.json({
       success: true,
       data: {
         ...roomData,
-        shareLink: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/room/${room.roomId}`,
+        shareLink: `${appUrl}/room/${room.roomId}`,
       },
     });
   } catch (error: any) {

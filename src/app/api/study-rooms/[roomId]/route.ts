@@ -23,12 +23,14 @@ export async function GET(
 
     const members = await RoomMember.find({ roomId });
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin') || 'https://klyra-talk-team-up-thrive.vercel.app';
+
     return NextResponse.json({
       success: true,
       data: {
         room,
         members,
-        shareLink: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/room/${room.roomId}`,
+        shareLink: `${appUrl}/room/${room.roomId}`,
       },
     });
   } catch (error: any) {
