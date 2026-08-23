@@ -1,6 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Info,
@@ -28,8 +27,13 @@ export default function RightInfoPanel() {
 
   const [notifications, setNotifications] = useState(true);
   const [muteChat, setMuteChat] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isRightInfoOpen || !activeConversationId) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isRightInfoOpen || !activeConversationId || !mounted) return null;
 
   const conv = conversations.find((c) => c._id === activeConversationId);
   if (!conv) return null;
@@ -52,7 +56,7 @@ export default function RightInfoPanel() {
     { id: 'pinned', label: 'Pinned', icon: Pin },
   ] as const;
 
-  return (
+  const panelContent = (
     <AnimatePresence>
       {/* Mobile Backdrop Overlay (< xl) */}
       <div
@@ -424,4 +428,6 @@ export default function RightInfoPanel() {
       </motion.aside>
     </AnimatePresence>
   );
+
+  return createPortal(panelContent, document.body);
 }
