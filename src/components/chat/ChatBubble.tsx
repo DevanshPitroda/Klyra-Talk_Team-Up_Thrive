@@ -20,7 +20,14 @@ function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
   const setActiveMeetingRoomId = useChatStore((state) => state.setActiveMeetingRoomId);
   const [showFullEmojiPicker, setShowFullEmojiPicker] = useState(false);
   
-  const isMe = session?.user?.id === message.senderId._id;
+  const senderIdStr = typeof message.senderId === 'object' && message.senderId !== null
+    ? message.senderId._id
+    : String(message.senderId || '');
+  const senderName = typeof message.senderId === 'object' && message.senderId !== null
+    ? message.senderId.name
+    : 'User';
+
+  const isMe = Boolean(session?.user?.id && session.user.id === senderIdStr);
   const time = new Date(message.createdAt).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -754,7 +761,7 @@ function ChatBubble({ message, showSenderName, onForward }: ChatBubbleProps) {
 
           {showSenderName && !isMe && (
             <span className="text-[11px] font-semibold text-brand-green/90 mb-0.5 truncate">
-              {message.senderId.name}
+              {senderName}
             </span>
           )}
 

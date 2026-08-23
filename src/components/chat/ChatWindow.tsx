@@ -154,12 +154,19 @@ export default function ChatWindow() {
         divider = <DateDivider key={`date-${msg._id}`} date={messageDate} />;
         lastDate = messageDate;
       }
+      const prevSender = displayMessages[index - 1]?.senderId;
+      const prevSenderId = prevSender
+        ? (typeof prevSender === 'object' && prevSender !== null ? prevSender._id : String(prevSender))
+        : null;
+      const currentSenderId = typeof msg.senderId === 'object' && msg.senderId !== null ? msg.senderId._id : String(msg.senderId || '');
+      const shouldShowSenderName = index === 0 || prevSenderId !== currentSenderId;
+
       return (
         <React.Fragment key={msg._id}>
           {divider}
           <ChatBubble
             message={msg}
-            showSenderName={index === 0 || displayMessages[index - 1]?.senderId._id !== msg.senderId._id}
+            showSenderName={shouldShowSenderName}
             onForward={(message) => {
               setForwardMsg(message);
               setIsForwardOpen(true);
