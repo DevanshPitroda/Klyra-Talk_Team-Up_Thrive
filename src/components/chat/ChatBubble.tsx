@@ -100,10 +100,17 @@ export default function ChatBubble({ message, showSenderName, onForward }: ChatB
           removeMessage(message.conversationId, message._id);
         } else {
           updateMessage(message.conversationId, message._id, { isDeleted: true, body: '' });
+          getSocket()?.emit('message_deleted', {
+            conversationId: message.conversationId,
+            messageId: message._id,
+          });
         }
+      } else {
+        alert(data.error || 'Failed to delete message');
       }
     } catch (err) {
       console.error('Failed to delete message:', err);
+      alert('Network error while deleting message');
     } finally {
       setIsDeleting(false);
     }

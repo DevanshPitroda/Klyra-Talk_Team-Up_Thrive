@@ -28,7 +28,12 @@ export async function DELETE(
 
     if (scope === 'everyone') {
       // Only the sender can delete for everyone
-      if (message.senderId.toString() !== session.user.id) {
+      const rawSender: any = message.senderId;
+      const senderIdStr = typeof rawSender === 'object' && rawSender !== null
+        ? (rawSender._id ? rawSender._id.toString() : rawSender.toString())
+        : String(rawSender);
+
+      if (senderIdStr !== session.user.id) {
         return NextResponse.json(
           { success: false, error: 'Only the sender can delete for everyone' },
           { status: 403 }
