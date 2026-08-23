@@ -35,10 +35,13 @@ export default function SidebarHeader({ onSearchClick }: SidebarHeaderProps) {
         onClose={() => setIsProfileModalOpen(false)} 
       />
 
-      <ThemeSwitcher
-        isOpen={isThemeSwitcherOpen}
-        onClose={() => setIsThemeSwitcherOpen(false)}
-      />
+      {/* ThemeSwitcher only mounts on mobile — desktop uses LeftNav's instance */}
+      <div className="md:hidden">
+        <ThemeSwitcher
+          isOpen={isThemeSwitcherOpen}
+          onClose={() => setIsThemeSwitcherOpen(false)}
+        />
+      </div>
 
       <div className="h-16 bg-bg-secondary border-b border-border-default flex items-center justify-between px-4 shrink-0 shadow-sm">
         {/* Current User details */}
@@ -66,10 +69,10 @@ export default function SidebarHeader({ onSearchClick }: SidebarHeaderProps) {
 
         {/* Header Actions */}
         <div className="flex items-center gap-1">
-          {/* 🎨 Theme Switcher Button */}
+          {/* 🎨 Theme Switcher Button — mobile only, desktop uses LeftNav */}
           <button
             onClick={() => setIsThemeSwitcherOpen(true)}
-            className="p-2 hover:bg-bg-input rounded-full text-text-secondary hover:text-brand-green transition cursor-pointer text-base"
+            className="md:hidden p-2 hover:bg-bg-input rounded-full text-text-secondary hover:text-brand-green transition cursor-pointer text-base"
             title="Change Theme"
           >
             🎨
