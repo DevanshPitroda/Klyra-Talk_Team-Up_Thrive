@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useSession } from 'next-auth/react';
 import { useChatStore } from '../store/useChatStore';
@@ -9,166 +9,167 @@ let socketInstance: Socket | null = null;
 
 export function useSocket() {
   const { data: session } = useSession();
-  const socketRef = useRef<Socket | null>(null);
-
-  const {
-    addMessage,
-    updateConversationLastMessage,
-    incrementUnreadCount,
-    resetUnreadCount,
-    setOnlineUserIds,
-    addUserOnline,
-    removeUserOffline,
-    setTyping,
-    activeConversationId,
-    markMessagesAsDelivered,
-    markMessagesAsSeen,
-  } = useChatStore();
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
 
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 
+    const SOCKET_URL =
+      process.env.NEXT_PUBLIC_SOCKET_URL ||
       (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
 
-    // Reuse existing connection if available
-    if (!socketInstance || !socketInstance.connected) {
+    // 1. Create EXACTLY ONE socket instance per application lifecycle
+    if (!socketInstance) {
       socketInstance = io(SOCKET_URL, {
-        transports:        ['websocket', 'polling'],
+        transports: ['websocket', 'polling'],
         reconnectionDelay: 1000,
-        reconnection:      true,
+        reconnectionAttempts: Infinity,
+        reconnection: true,
+        autoConnect: true,
       });
     }
 
-    socketRef.current = socketInstance;
     const socket = socketInstance;
 
-    // ── Register this user once connected ──────────────────────────────
-    socket.on('connect', () => {
+    // ── Connection Status Handlers ─────────────────────────────────────
+    const onConnect = () => {
       console.log('[Socket] Connected:', socket.id);
+      setIsConnected(true);
+      setIsReconnecting(false);
       socket.emit('user_connected', session.user.id);
-    });
+    };
 
-    // Register immediately if already connected
+    const onDisconnect = (reason: string) => {
+      console.warn('[Socket] Disconnected:', reason);
+      setIsConnected(false);
+      if (reason === 'io server disconnect') {
+        socket.connect();
+      }
+    };
+
+    const onConnectError = (err: Error) => {
+      console.warn('[Socket] Connection attempt (retrying in background):', err.message);
+      setIsConnected(false);
+      setIsReconnecting(true);
+    };
+
+    const onReconnectAttempt = () => {
+      setIsReconnecting(true);
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('connect_error', onConnectError);
+    socket.io.on('reconnect_attempt', onReconnectAttempt);
+
     if (socket.connected) {
+      setIsConnected(true);
       socket.emit('user_connected', session.user.id);
     }
 
     // ── Presence events ────────────────────────────────────────────────
-    socket.on('online_users', (userIds: string[]) => {
-      setOnlineUserIds(userIds);
-    });
+    const onOnlineUsers = (userIds: string[]) => {
+      useChatStore.getState().setOnlineUserIds(userIds);
+    };
 
-    socket.on('user_online', (userId: string) => {
-      addUserOnline(userId);
-    });
+    const onUserOnline = (userId: string) => {
+      useChatStore.getState().addUserOnline(userId);
+    };
 
-    socket.on('user_offline', (userId: string) => {
-      removeUserOffline(userId);
-    });
+    const onUserOffline = (userId: string) => {
+      useChatStore.getState().removeUserOffline(userId);
+    };
 
     // ── New incoming message ───────────────────────────────────────────
-    socket.on('new_message', ({ conversationId, message }) => {
-      const { activeConversationId: activeChatId } = useChatStore.getState();
-      const isCurrentChat = conversationId === activeChatId;
+    const onNewMessage = ({ conversationId, message }: any) => {
+      const store = useChatStore.getState();
+      const isCurrentChat = conversationId === store.activeConversationId;
 
-      // Add to message list
-      addMessage(conversationId, message);
-
-      // Update sidebar last-message preview
-      updateConversationLastMessage(conversationId, {
-        _id:      message._id,
-        body:     message.body,
+      store.addMessage(conversationId, message);
+      store.updateConversationLastMessage(conversationId, {
+        _id: message._id,
+        body: message.body,
         senderId: message.senderId,
-        type:     message.type,
+        type: message.type,
         createdAt: message.createdAt,
       });
 
       if (isCurrentChat) {
-        // If chat is open, immediately mark as seen
         socket.emit('mark_as_seen', {
           conversationId,
           messageId: message._id,
         });
       } else {
-        // Badge unread count if this isn't the active chat
-        incrementUnreadCount(conversationId);
+        store.incrementUnreadCount(conversationId);
       }
-    });
+    };
 
     // ── Delivery & Seen receipts ───────────────────────────────────────
-    socket.on('messages_delivered', ({ conversationId, userId, timestamp }) => {
-      markMessagesAsDelivered(conversationId, userId, timestamp);
-    });
+    const onMessagesDelivered = ({ conversationId, userId, timestamp }: any) => {
+      useChatStore.getState().markMessagesAsDelivered(conversationId, userId, timestamp);
+    };
 
-    socket.on('messages_seen', ({ conversationId, userId, timestamp }) => {
-      markMessagesAsSeen(conversationId, userId, timestamp);
+    const onMessagesSeen = ({ conversationId, userId, timestamp }: any) => {
+      const store = useChatStore.getState();
+      store.markMessagesAsSeen(conversationId, userId, timestamp);
       if (userId === session.user.id) {
-        resetUnreadCount(conversationId);
+        store.resetUnreadCount(conversationId);
       }
-    });
+    };
 
     // ── Message Reactions & Pins ───────────────────────────────────────
-    socket.on('message_reaction', ({ conversationId, messageId, reactions }: any) => {
+    const onMessageReaction = ({ conversationId, messageId, reactions }: any) => {
       useChatStore.getState().updateMessage(conversationId, messageId, { reactions });
-    });
+    };
 
-    socket.on('message_pin', ({ conversationId, messageId, isPinned, pinnedAt }: any) => {
+    const onMessagePin = ({ conversationId, messageId, isPinned, pinnedAt }: any) => {
       useChatStore.getState().updateMessage(conversationId, messageId, { isPinned, pinnedAt });
-    });
+    };
 
     // ── Typing indicators ──────────────────────────────────────────────
-    socket.on('typing_start', ({ conversationId, userName }: { conversationId: string; userName: string }) => {
-      setTyping(conversationId, userName, true);
-    });
-
-    socket.on('typing_stop', ({ conversationId, userName }: { conversationId: string; userName: string }) => {
-      setTyping(conversationId, userName, false);
-    });
-
-    // ── Cleanup listeners on unmount (keep socket alive) ──────────────
-    return () => {
-      socket.off('connect');
-      socket.off('online_users');
-      socket.off('user_online');
-      socket.off('user_offline');
-      socket.off('new_message');
-      socket.off('messages_delivered');
-      socket.off('messages_seen');
-      socket.off('message_reaction');
-      socket.off('message_pin');
-      socket.off('typing_start');
-      socket.off('typing_stop');
+    const onTypingStart = ({ conversationId, userName }: { conversationId: string; userName: string }) => {
+      useChatStore.getState().setTyping(conversationId, userName, true);
     };
-  }, [
-    session?.user?.id,
-    addMessage,
-    updateConversationLastMessage,
-    incrementUnreadCount,
-    setOnlineUserIds,
-    addUserOnline,
-    removeUserOffline,
-    setTyping,
-    markMessagesAsDelivered,
-    markMessagesAsSeen,
-  ]);
 
-  // ── Join / leave conversation rooms when active chat changes ──────────
-  useEffect(() => {
-    const socket = socketRef.current;
-    if (!socket || !activeConversationId) return;
-
-    socket.emit('join_room', activeConversationId);
-
-    return () => {
-      socket.emit('leave_room', activeConversationId);
+    const onTypingStop = ({ conversationId, userName }: { conversationId: string; userName: string }) => {
+      useChatStore.getState().setTyping(conversationId, userName, false);
     };
-  }, [activeConversationId]);
 
-  return socketRef;
+    socket.on('online_users', onOnlineUsers);
+    socket.on('user_online', onUserOnline);
+    socket.on('user_offline', onUserOffline);
+    socket.on('new_message', onNewMessage);
+    socket.on('messages_delivered', onMessagesDelivered);
+    socket.on('messages_seen', onMessagesSeen);
+    socket.on('message_reaction', onMessageReaction);
+    socket.on('message_pin', onMessagePin);
+    socket.on('typing_start', onTypingStart);
+    socket.on('typing_stop', onTypingStop);
+
+    // ── Cleanup listeners on unmount (keep single socket alive) ──────
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('connect_error', onConnectError);
+      socket.io.off('reconnect_attempt', onReconnectAttempt);
+
+      socket.off('online_users', onOnlineUsers);
+      socket.off('user_online', onUserOnline);
+      socket.off('user_offline', onUserOffline);
+      socket.off('new_message', onNewMessage);
+      socket.off('messages_delivered', onMessagesDelivered);
+      socket.off('messages_seen', onMessagesSeen);
+      socket.off('message_reaction', onMessageReaction);
+      socket.off('message_pin', onMessagePin);
+      socket.off('typing_start', onTypingStart);
+      socket.off('typing_stop', onTypingStop);
+    };
+  }, [session?.user?.id]);
+
+  return { socket: socketInstance, isConnected, isReconnecting };
 }
 
-// Expose the socket instance so ChatInput can emit events
 export function getSocket(): Socket | null {
   return socketInstance;
 }

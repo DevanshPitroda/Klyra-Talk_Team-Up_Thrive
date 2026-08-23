@@ -21,8 +21,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { setConversations, setActiveConversationId } = useChatStore();
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
 
-  // Initialise Socket.IO connection for real-time events
-  useSocket();
+  // Initialise Socket.IO connection for real-time events & track reconnect status
+  const { isReconnecting } = useSocket();
 
   // 1. Session Redirect checks
   useEffect(() => {
@@ -86,8 +86,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   if (!session) return null;
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden flex bg-bg-primary text-text-primary touch-none">
-      <LeftNav />
+    <div className="h-[100dvh] w-full overflow-hidden flex flex-col bg-bg-primary text-text-primary touch-none">
+      {isReconnecting && (
+        <div className="bg-amber-500/20 border-b border-amber-500/40 text-amber-300 text-xs font-bold px-4 py-1.5 flex items-center justify-between z-50 shrink-0 select-none animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span>🟡 Reconnecting to chat server... (Your session remains active)</span>
+          </div>
+        </div>
+      )}
+      <div className="flex-1 flex w-full overflow-hidden">
+        <LeftNav />
 
       {/* 
         Multi-panel layout: 
@@ -123,6 +132,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         initialRoomCode={joinLinkCode}
         onClose={() => setJoinLinkCode(undefined)}
       />
+      </div>
     </div>
   );
 }
