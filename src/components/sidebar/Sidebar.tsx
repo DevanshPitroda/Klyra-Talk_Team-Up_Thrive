@@ -15,8 +15,10 @@ export default function Sidebar() {
 
   return (
     <div className="w-full h-full flex flex-col relative bg-bg-secondary select-none">
-      {/* Mobile & Sidebar Header Bar */}
-      <SidebarHeader onSearchClick={() => setIsSearchActive(true)} />
+      {/* Mobile-only Header Bar */}
+      <div className="md:hidden">
+        <SidebarHeader onSearchClick={() => setIsSearchActive(true)} />
+      </div>
 
       {/* Discord-style Active Voice Channel Banner */}
       {activeMeetingRoomId && (
